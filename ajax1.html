@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FETCH DATA AND DELETE DATA</title>
+  <style>
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      background-color: #f9fbfc;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #34495e;
+      margin-bottom: 10px;
+      font-size: 2.5rem;
+      font-weight: bold;
+    }
+
+    p {
+      color: #7f8c8d;
+      margin-bottom: 30px;
+      font-size: 1.2rem;
+    }
+
+    #div1 {
+      margin-top: 20px;
+      width: 90%;
+      max-width: 800px;
+      background-color: #ffffff;
+      border: 1px solid #d1d8e0;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      overflow-y: auto;
+      max-height: 400px;
+    }
+
+    #div1 > div {
+      margin-bottom: 15px;
+      padding: 12px;
+      border-bottom: 1px solid #ecf0f1;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      color: #2c3e50;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+
+    #div1 > div:hover {
+      background-color: #e3f2fd;
+    }
+
+    #div1 > div:last-child {
+      border-bottom: none;
+    }
+
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      margin: 5px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+      background-color: #1e88e5;
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      background-color: #1565c0;
+      transform: translateY(0);
+    }
+
+    button:focus {
+      outline: none;
+      box-shadow: 0 0 8px rgba(52, 152, 219, 0.6);
+    }
+
+    .button-container {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 10px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      font-size: 1rem;
+      animation: fadeOut 2s forwards;
+    }
+
+    @keyframes fadeOut {
+      0% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .fade-out {
+      animation: fadeOut 0.5s forwards;
+    }
+  </style>
+</head>
+<body>
+  <h1>Fetch Data and Delete Data</h1>
+  <p>Click the buttons below to fetch posts or remove them from the list.</p>
+  <div id="div1" aria-live="polite">POSTS ARE:</div>
+  <br>
+  <div class="button-container">
+    <button onclick="getdata()">GET DATA</button>
+    <button onclick="removedata()">REMOVE DATA</button>
+    <button onclick="removeAllData()">REMOVE ENTIRE DATA</button>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      function showToast(message) {
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => document.body.removeChild(toast), 2000);
+      }
+
+      function getdata() {
+        let url = `https://jsonplaceholder.typicode.com/posts`;
+        fetch(url)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json();
+          })
+          .then(data => {
+            let div1 = document.getElementById("div1");
+            div1.innerHTML = "POSTS ARE:";
+            data.forEach(element => {
+              let div2 = document.createElement("div");
+              div2.textContent = `${element.id} - ${element.title} ---- ${element.body}`;
+              div1.appendChild(div2);
+            });
+          })
+          .catch(error => {
+            console.error(error);
+            showToast("Failed to fetch posts. Please try again later.");
+          });
+      }
+
+      function removedata() {
+        let div1 = document.getElementById("div1");
+        if (div1.children.length > 0) {
+          const lastChild = div1.lastChild;
+          lastChild.classList.add("fade-out");
+          setTimeout(() => div1.removeChild(lastChild), 500);
+        } else {
+          showToast("FIRST FETCH SOME DATA AND ADD DATA THEN REMOVE DATA!");
+        }
+      }
+
+      function removeAllData() {
+        let div1 = document.getElementById("div1");
+        if (div1.children.length > 0) {
+          while (div1.children.length > 0) {
+            div1.removeChild(div1.lastChild);
+          }
+        } else {
+          showToast("FIRST FETCH SOME DATA AND ADD DATA THEN REMOVE DATA!");
+        }
+      }
+
+      window.getdata = getdata;
+      window.removedata = removedata;
+      window.removeAllData = removeAllData;
+    });
+  </script>
+</body>
+</html>
